@@ -45,3 +45,12 @@ verify_jwt = true
 verify_jwt = false
 [functions.track-pick]
 verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false
+[functions.apple-webhook]
+verify_jwt = false
+[functions.create-checkout-session]
+verify_jwt = true
+[functions.link-apple-receipt]
+verify_jwt = true

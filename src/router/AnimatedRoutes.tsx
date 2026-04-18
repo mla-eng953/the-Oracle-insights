@@ -13,6 +13,7 @@ const Analytics = lazy(() => import("@/pages/Analytics"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const Settings = lazy(() => import("@/pages/Settings"));
 const Compliance = lazy(() => import("@/pages/Compliance"));
+const Billing = lazy(() => import("@/pages/Billing"));
 const Auth = lazy(() => import("@/pages/Auth"));
 const Install = lazy(() => import("@/pages/Install"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -43,6 +44,7 @@ export function AnimatedRoutes() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/compliance" element={<Compliance />} />
+          <Route path="/billing" element={<Billing />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth/callback" element={<Auth />} />
           <Route path="/install" element={<Install />} />
