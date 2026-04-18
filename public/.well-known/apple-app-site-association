@@ -1,0 +1,20 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID.app.oracleinsights.OracleApp"],
+        "components": [
+          { "/": "/auth/callback*", "comment": "OAuth post-redirect to native shell" },
+          { "/": "/billing*", "comment": "Deep link from Stripe checkout return" },
+          { "/": "/picks/*", "comment": "Shareable pick details" },
+          { "/": "/oracle*" },
+          { "/": "/results*" },
+          { "/": "/compliance*" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAMID.app.oracleinsights.OracleApp"]
+  }
+}

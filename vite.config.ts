@@ -11,7 +11,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png"],
+      includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png", "sw-push.js"],
+      injectManifest: undefined,
       manifest: {
         name: "The Oracle",
         short_name: "Oracle",
@@ -32,6 +33,7 @@ export default defineConfig({
           /^\/auth\/callback/,
           /^\/api\//,
           /^\/functions\//,
+          /^\/\.well-known\//,
         ],
         runtimeCaching: [
           {

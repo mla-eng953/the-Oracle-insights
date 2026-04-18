@@ -4,6 +4,7 @@
 import { preflight, jsonResponse } from "../_shared/cors.ts";
 import { adminClient } from "../_shared/supabase.ts";
 import { americanToImpliedProb } from "../_shared/oddsMath.ts";
+import { createLogger } from "../_shared/logger.ts";
 
 interface PickRow {
   id: string;
@@ -17,6 +18,7 @@ interface PickRow {
 
 Deno.serve(async (req) => {
   const pre = preflight(req); if (pre) return pre;
+  const log = createLogger("settle-picks");
   try {
     const supabase = adminClient();
 
@@ -48,9 +50,12 @@ Deno.serve(async (req) => {
       settled++;
     }
 
+    log.info("done", { settled });
+    await log.flush();
     return jsonResponse({ ok: true, settled });
   } catch (err) {
-    console.error("[settle-picks]", err);
+    log.error("failed", { error: (err as Error).message });
+    await log.flush();
     return jsonResponse({ ok: false, error: (err as Error).message }, 500);
   }
 });

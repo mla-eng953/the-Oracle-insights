@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { isOptedOut, setOptOut } from "@/lib/telemetry";
 import { supabase } from "@/lib/supabase";
+import { useWebPushSubscription } from "@/hooks/usePush";
+import { Bell } from "lucide-react";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
   const [optedOut, setOpted] = useState(isOptedOut());
   const [exporting, setExporting] = useState(false);
+  const push = useWebPushSubscription();
 
   async function exportData() {
     setExporting(true);
@@ -63,6 +66,24 @@ export default function Settings() {
               Set session limits, deposit-like exposure limits, and self-exclusion windows.
             </p>
             <Button asChild variant="outline" className="w-fit"><Link to="/compliance">Open controls</Link></Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle className="flex items-center gap-2"><Bell className="h-4 w-4" />Push notifications</CardTitle></CardHeader>
+          <CardContent className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium">Steam moves & line-movement alerts</p>
+              <p className="text-xs text-muted-foreground">
+                {push.state === "unsupported" && "Your browser does not support web push."}
+                {push.state === "denied" && "Permission denied. Re-enable in your browser settings."}
+                {push.state === "subscribed" && "Subscribed."}
+                {(push.state === "idle" || push.state === "granted") && "Tap to subscribe."}
+              </p>
+            </div>
+            {push.state !== "subscribed" && push.state !== "unsupported" && push.state !== "denied" && (
+              <Button variant="gold" size="sm" onClick={push.subscribe}>Subscribe</Button>
+            )}
           </CardContent>
         </Card>
 

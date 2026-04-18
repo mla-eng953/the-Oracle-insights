@@ -4,7 +4,8 @@ import { PickCard } from "@/components/PickCard";
 import { useSegmentedPicks } from "@/hooks/usePicks";
 import { useCLV } from "@/hooks/useCLV";
 import { CLVChart } from "@/components/CLVChart";
-import { Activity, ArrowUpRight, Flame } from "lucide-react";
+import { NewsFeed } from "@/components/NewsFeed";
+import { Activity, ArrowUpRight, Flame, Newspaper } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Index() {
@@ -61,6 +62,11 @@ export default function Index() {
           <p className="text-[11px] text-muted-foreground mt-1">
             Positive and rising = beating the closing line. Primary edge indicator.
           </p>
+        </section>
+
+        <section>
+          <Heading icon={<Newspaper className="h-4 w-4 text-muted-foreground" />} title="News" />
+          <NewsFeed limit={6} />
         </section>
       </div>
     </PageTransition>

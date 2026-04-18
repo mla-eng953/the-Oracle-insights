@@ -37,6 +37,10 @@ targets:
       path: OracleApp.entitlements
       properties:
         com.apple.developer.in-app-payments: []
+        com.apple.developer.associated-domains:
+          - applinks:app.oracleinsights.app
+          - webcredentials:app.oracleinsights.app
+        aps-environment: production
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.oracleinsights.OracleApp

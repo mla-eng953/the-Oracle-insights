@@ -5,9 +5,11 @@
 
 import { preflight, jsonResponse } from "../_shared/cors.ts";
 import { adminClient, requireUser } from "../_shared/supabase.ts";
+import { createLogger } from "../_shared/logger.ts";
 
 Deno.serve(async (req) => {
   const pre = preflight(req); if (pre) return pre;
+  const log = createLogger("track-pick");
   try {
     const { user } = await requireUser(req);
     const { pickId, stakeUsd, entryAmerican } = await req.json() as {
@@ -44,10 +46,13 @@ Deno.serve(async (req) => {
     }, { onConflict: "user_id,pick_id" });
     if (error) return jsonResponse({ ok: false, error: error.message }, 500);
 
+    log.info("tracked", { user_id: user.id, pick_id: pickId });
+    await log.flush();
     return jsonResponse({ ok: true });
   } catch (err) {
     if (err instanceof Response) return err;
-    console.error("[track-pick]", err);
+    log.error("failed", { error: (err as Error).message });
+    await log.flush();
     return jsonResponse({ ok: false, error: (err as Error).message }, 500);
   }
 });

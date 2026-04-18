@@ -4,9 +4,11 @@
 import { preflight, jsonResponse } from "../_shared/cors.ts";
 import { adminClient } from "../_shared/supabase.ts";
 import { americanToImpliedProb, americanToDecimal } from "../_shared/oddsMath.ts";
+import { createLogger } from "../_shared/logger.ts";
 
 Deno.serve(async (req) => {
   const pre = preflight(req); if (pre) return pre;
+  const log = createLogger("capture-closing-odds");
   try {
     const supabase = adminClient();
     const now = new Date();
@@ -34,9 +36,12 @@ Deno.serve(async (req) => {
       captured++;
     }
 
+    log.info("done", { captured });
+    await log.flush();
     return jsonResponse({ ok: true, captured });
   } catch (err) {
-    console.error("[capture-closing-odds]", err);
+    log.error("failed", { error: (err as Error).message });
+    await log.flush();
     return jsonResponse({ ok: false, error: (err as Error).message }, 500);
   }
 });

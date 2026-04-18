@@ -66,3 +66,11 @@ verify_jwt = false
 verify_jwt = true
 [functions.check-device-fingerprint]
 verify_jwt = true
+[functions.send-push]
+verify_jwt = false
+[functions.register-push-token]
+verify_jwt = true
+[functions.sign-upload]
+verify_jwt = true
+[functions.admin-users]
+verify_jwt = true

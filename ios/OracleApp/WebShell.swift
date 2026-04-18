@@ -9,6 +9,7 @@ struct WebShell: UIViewControllerRepresentable {
                       ?? "https://app.oracleinsights.app")!
         let vc = WebViewController(initialURL: url)
         storeKit.attach(to: vc)
+        PushManager.shared.attach(to: vc)
         return vc
     }
 

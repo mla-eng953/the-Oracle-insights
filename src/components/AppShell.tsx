@@ -4,6 +4,7 @@ import { AppHeader } from "./AppHeader";
 import { AppNav } from "./AppNav";
 import { OfflineBanner } from "./OfflineBanner";
 import { ResponsibleGamblingBanner } from "./ResponsibleGamblingBanner";
+import { OnboardingTutorial } from "./OnboardingTutorial";
 
 export function AppShell({ children }: PropsWithChildren) {
   const mobile = useIsMobile();
@@ -15,6 +16,7 @@ export function AppShell({ children }: PropsWithChildren) {
         <main className="flex-1 overflow-y-auto px-3 pb-4">{children}</main>
         <AppNav variant="bottom" />
         <ResponsibleGamblingBanner />
+        <OnboardingTutorial />
       </div>
     );
   }
@@ -27,6 +29,7 @@ export function AppShell({ children }: PropsWithChildren) {
         <main className="flex-1 overflow-y-auto px-6 py-4">{children}</main>
         <ResponsibleGamblingBanner />
       </div>
+      <OnboardingTutorial />
     </div>
   );
 }
