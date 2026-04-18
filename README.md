@@ -43,7 +43,8 @@ Required function secrets: `ODDS_API_KEY`, `KALSHI_API_KEY`. Do not commit.
 
 ## Critical before App Store submission
 
-See `COMPLIANCE.md`.
+- Engineering / compliance status: [`COMPLIANCE.md`](COMPLIANCE.md).
+- Submission pack (metadata, privacy label, review notes, screenshots, secrets, final checklist): [`app-store/`](app-store/README.md).
 
 ## Algorithm tuning knobs
 

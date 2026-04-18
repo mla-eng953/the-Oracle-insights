@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --max-warnings 0",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "icons": "node scripts/generate-icons.mjs",
+    "fetch-apple-ca": "node scripts/fetch-apple-root-ca.mjs"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "1.1.2",
@@ -59,7 +61,8 @@
     "tailwindcss-animate": "1.0.7",
     "typescript": "5.6.3",
     "vite": "5.4.11",
-    "vite-plugin-pwa": "0.21.1"
+    "vite-plugin-pwa": "0.21.1",
+    "sharp": "0.33.5"
   },
   "engines": {
     "node": ">=20"

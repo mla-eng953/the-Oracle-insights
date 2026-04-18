@@ -1,0 +1,7 @@
+{
+  "source": "https://www.apple.com/certificateauthority/AppleRootCA-G3.cer",
+  "fetched_at": null,
+  "cert_sha256": null,
+  "spki_base64": "",
+  "note": "Placeholder. Run `pnpm fetch-apple-ca` to populate before enabling APPLE_VERIFY_CHAIN=1."
+}

@@ -20,6 +20,8 @@ targets:
     resources:
       - path: products.json
       - path: StoreConfig.storekit
+      - path: PrivacyInfo.xcprivacy
+      - path: AppIcon.appiconset
     info:
       path: Info.plist
       properties:
