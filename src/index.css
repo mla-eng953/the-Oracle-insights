@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 48 100% 50%;
+    --primary-foreground: 0 0% 8%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 48 100% 50%;
+    --accent-foreground: 0 0% 8%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 48 100% 50%;
+    --radius: 0.625rem;
+
+    --gold: 48 100% 50%;
+    --win: 142 71% 45%;
+    --loss: 0 75% 55%;
+    --push: 45 7% 60%;
+
+    --glass-border-light: 0 0% 100% / 0.06;
+    --glass-border-strong: 48 100% 50% / 0.12;
+  }
+
+  * { @apply border-border; }
+  html, body, #root { height: 100%; }
+  body {
+    font-feature-settings: "cv11", "ss01";
+    background:
+      radial-gradient(1200px 600px at 20% -10%, hsl(48 100% 50% / 0.05), transparent),
+      radial-gradient(900px 500px at 120% 10%, hsl(200 90% 50% / 0.04), transparent),
+      hsl(var(--background));
+  }
+
+  /* Mono numerics for odds/stats */
+  .tabular-mono { font-variant-numeric: tabular-nums; font-family: var(--font-mono, ui-monospace); }
+}
+
+@layer components {
+  .glass {
+    background: linear-gradient(180deg, hsl(0 0% 100% / 0.02), hsl(0 0% 100% / 0.005));
+    border: 1px solid hsl(var(--glass-border-light));
+    backdrop-filter: blur(8px);
+  }
+  .glass-strong {
+    background: linear-gradient(180deg, hsl(48 100% 50% / 0.04), hsl(0 0% 100% / 0.005));
+    border: 1px solid hsl(var(--glass-border-strong));
+    backdrop-filter: blur(10px);
+  }
+  .dot-win { @apply inline-block h-1.5 w-1.5 rounded-full bg-[hsl(var(--win))]; }
+  .dot-loss { @apply inline-block h-1.5 w-1.5 rounded-full bg-[hsl(var(--loss))]; }
+  .dot-push { @apply inline-block h-1.5 w-1.5 rounded-full bg-[hsl(var(--push))]; }
+  .oracle-gradient-text {
+    background: linear-gradient(90deg, hsl(var(--gold)), hsl(48 100% 75%));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+}
+
+@layer utilities {
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .scroll-snap-x { scroll-snap-type: x mandatory; }
+  .snap-start { scroll-snap-align: start; }
+}
