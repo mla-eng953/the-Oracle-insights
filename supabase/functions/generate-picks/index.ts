@@ -5,6 +5,7 @@
 import { preflight, jsonResponse } from "../_shared/cors.ts";
 import { adminClient } from "../_shared/supabase.ts";
 import { americanToDecimal, americanToImpliedProb } from "../_shared/oddsMath.ts";
+import { createLogger } from "../_shared/logger.ts";
 import {
   computeFairPrice,
   computeEdge,
@@ -32,10 +33,13 @@ const SPORT_WEIGHTS: Record<string, { sharp: number; signal: number; news: numbe
 
 Deno.serve(async (req) => {
   const pre = preflight(req); if (pre) return pre;
+  const log = createLogger("generate-picks");
+  const start = Date.now();
 
   try {
     const supabase = adminClient();
     const { sport } = (await req.json().catch(() => ({}))) as { sport?: string };
+    log.info("started", { sport: sport ?? "all" });
 
     const rawMatches = await loadMatches(sport);
     const oddsByMatch = await loadOdds(rawMatches.map(m => m.id));
@@ -99,14 +103,19 @@ Deno.serve(async (req) => {
     }
 
     if (inserts.length === 0) {
+      log.info("no_picks_above_thresholds", { ms: Date.now() - start });
+      await log.flush();
       return jsonResponse({ ok: true, inserted: 0, reason: "no picks above thresholds" });
     }
 
     const { error } = await supabase.from("picks").insert(inserts);
     if (error) throw error;
+    log.info("inserted", { count: inserts.length, ms: Date.now() - start });
+    await log.flush();
     return jsonResponse({ ok: true, inserted: inserts.length });
   } catch (err) {
-    console.error("[generate-picks]", err);
+    log.error("failed", { error: (err as Error).message, stack: (err as Error).stack });
+    await log.flush();
     return jsonResponse({ ok: false, error: (err as Error).message }, 500);
   }
 });

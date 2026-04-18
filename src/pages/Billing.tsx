@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { PageTransition } from "@/components/PageTransition";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,23 @@ export default function Billing() {
   const { data: ent } = useEntitlements();
   const [params] = useSearchParams();
   const [loading, setLoading] = useState<EntitlementTier | null>(null);
+
+  // Listen for StoreKit success from the native iOS shell and link the
+  // originalTransactionId to the Supabase user for webhook reconciliation.
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      const data = event.data as { kind?: string; originalTransactionId?: string } | undefined;
+      if (!data || typeof data !== "object") return;
+      if (data.kind === "oracle:iap:success" && data.originalTransactionId) {
+        invokeFn("link-apple-receipt", {
+          originalTransactionId: data.originalTransactionId,
+          bundleId: "app.oracleinsights.OracleApp",
+        });
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
 
   async function upgrade(plan: "pro" | "elite") {
     setLoading(plan);

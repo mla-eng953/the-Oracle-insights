@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { ComplianceGate } from "@/components/ComplianceGate";
 import { AnimatedRoutes } from "@/router/AnimatedRoutes";
 import { useRealtimeSettlements } from "@/hooks/useSettlements";
+import { useDeviceFingerprint } from "@/hooks/useDeviceFingerprint";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +24,7 @@ const PUBLIC_PATHS = new Set(["/auth", "/auth/callback", "/install"]);
 
 function ShellRouter() {
   useRealtimeSettlements();
+  useDeviceFingerprint();
   const location = useLocation();
   const isPublic = PUBLIC_PATHS.has(location.pathname);
 

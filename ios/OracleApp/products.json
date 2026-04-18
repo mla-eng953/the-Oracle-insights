@@ -1,0 +1,22 @@
+{
+  "products": [
+    {
+      "id": "app.oracleinsights.pro.monthly",
+      "type": "autoRenewable",
+      "group": "oracle-subscriptions",
+      "price_usd": 19,
+      "period": "P1M",
+      "display": "Pro",
+      "description": "Unlimited tracked picks, CLV dashboard, strategy profiles, alerts."
+    },
+    {
+      "id": "app.oracleinsights.elite.monthly",
+      "type": "autoRenewable",
+      "group": "oracle-subscriptions",
+      "price_usd": 49,
+      "period": "P1M",
+      "display": "Elite",
+      "description": "Everything in Pro plus early picks, API access, priority support."
+    }
+  ]
+}

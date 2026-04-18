@@ -1,0 +1,21 @@
+# Cloudflare Worker that schedules the Oracle pipeline.
+# DST-aware unlike pg_cron: cron expressions can be tied to a tz via the
+# triggers' `[[crons]] tz` field where supported, OR scheduled twice and
+# guarded with `New_York` time math (the pattern we use here so it's portable
+# across Workers runtime versions).
+
+name = "oracle-cron"
+main = "src/scheduled.ts"
+compatibility_date = "2025-04-01"
+
+# Set these via `wrangler secret put`:
+#   SUPABASE_URL
+#   SUPABASE_SERVICE_ROLE_KEY
+#   ALERT_WEBHOOK_URL  (Slack/Discord — optional)
+
+[triggers]
+# Run every minute. The worker filters per-call to the right schedule below.
+crons = ["* * * * *"]
+
+[observability]
+enabled = true

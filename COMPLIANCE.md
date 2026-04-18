@@ -15,7 +15,7 @@ Track this document top-to-bottom before submitting to Apple. Every unchecked it
 
 - [x] Client-side 21+ gate (`ComplianceGate`) with DOB input, persisted in `age_verifications`.
 - [x] **Persona ID-verification** integration: `create-persona-inquiry` edge fn launches the hosted flow; `persona-webhook` upserts `age_verifications.status` to `approved` / `declined`. UI in `IdVerify` component on Compliance page.
-- [ ] Refuse bulk account creation from same device — device-fingerprint via FingerprintJS or fingerprint-oss.
+- [x] **FingerprintJS Pro** device fingerprinting (`check-device-fingerprint` edge fn). Server-verifies the client-supplied `requestId` against Fingerprint's Server API, upserts `device_fingerprints`, and caps concurrent accounts per fingerprint (`MAX_ACCOUNTS_PER_FINGERPRINT`, default 3, in a 30-day rolling window).
 
 ## 3. Responsible gambling
 
@@ -50,7 +50,7 @@ Track this document top-to-bottom before submitting to Apple. Every unchecked it
 - [x] RLS on every table.
 - [x] Privacy policy (`/privacy`) + Terms of Service (`/terms`) routes.
 - [x] Data deletion: self-serve at `/settings/delete` → `delete-account` edge fn cascades through all user-scoped tables and `auth.users`. Satisfies Apple 5.1.1(v) and CCPA.
-- [ ] DSR (data subject request) endpoint for GDPR/CCPA export — `export-account-data` edge fn TBD.
+- [x] DSR export: `export-account-data` edge fn bundles every user-scoped row into a downloadable JSON. Rate-limited to 1/day via `audit_logs`. Button in Settings.
 - [ ] Signed URLs for any user-generated content in Storage.
 
 ## 7. Payments
@@ -64,8 +64,10 @@ Track this document top-to-bottom before submitting to Apple. Every unchecked it
 - [x] Error tracking: Sentry (`src/lib/telemetry.ts` + `ErrorBoundary` integration; respects opt-out and DNT).
 - [x] Product analytics: PostHog (autocapture off, IP scrubbed, opt-out surfaced in Settings).
 - [ ] Edge-function logs streamed to BetterStack / Grafana.
-- [x] `pg_cron` schedules in `20260418000008_cron.sql`: `generate-picks` (15 + 23 UTC), `capture-closing-odds` (every minute, self-filtering), `settle-picks` (every 5 min).
-- [ ] Weekly model-drift check: compare rolling-30-day CLV distribution per sport against the previous 30d — alert if it shifts >1σ.
+- [x] **Cloudflare Cron Triggers** (`cloudflare/src/scheduled.ts`) as primary scheduler — DST-aware via `America/New_York` wall clock. `pg_cron` jobs unscheduled in `20260418000009_disable_pg_cron.sql` but kept available as a failover.
+- [x] `capture-closing-odds` (every minute), `settle-picks` (every 5 min), `generate-picks` (11am + 7pm ET), `check-model-drift` (Mondays 6am ET).
+- [x] **BetterStack log drain** (`_shared/logger.ts`). `withLogger()` wrapper flushes per-request.
+- [x] **Weekly model-drift check** (`check-model-drift` edge fn): per-sport Welch's t-test on rolling-30d CLV vs prior 30d with Holm-Bonferroni correction. Alerts via `ALERT_WEBHOOK_URL` when corrected p < 0.05 AND mean shift ≥ 50 bp.
 
 ## 9. Model governance
 

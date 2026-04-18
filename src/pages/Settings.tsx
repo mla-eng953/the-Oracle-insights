@@ -6,10 +6,40 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { isOptedOut, setOptOut } from "@/lib/telemetry";
+import { supabase } from "@/lib/supabase";
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
   const [optedOut, setOpted] = useState(isOptedOut());
+  const [exporting, setExporting] = useState(false);
+
+  async function exportData() {
+    setExporting(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) return;
+      const base = import.meta.env.VITE_SUPABASE_URL as string;
+      const res = await fetch(`${base}/functions/v1/export-account-data`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        alert(body.error ?? `Export failed (${res.status})`);
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `oracle-data-export.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  }
   return (
     <PageTransition>
       <div className="flex flex-col gap-4 py-3">
@@ -54,6 +84,9 @@ export default function Settings() {
           <CardHeader><CardTitle>Account</CardTitle></CardHeader>
           <CardContent className="flex flex-col gap-2">
             <Button asChild variant="outline" className="w-fit"><Link to="/billing">Manage subscription</Link></Button>
+            <Button variant="outline" className="w-fit" onClick={exportData} disabled={exporting}>
+              {exporting ? "Preparing…" : "Download my data"}
+            </Button>
             <Link to="/settings/delete" className="text-xs text-[hsl(var(--loss))] underline">Delete account</Link>
           </CardContent>
         </Card>

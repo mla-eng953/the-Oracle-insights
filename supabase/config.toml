@@ -60,3 +60,9 @@ verify_jwt = false
 verify_jwt = true
 [functions.delete-account]
 verify_jwt = true
+[functions.check-model-drift]
+verify_jwt = false
+[functions.export-account-data]
+verify_jwt = true
+[functions.check-device-fingerprint]
+verify_jwt = true
