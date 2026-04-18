@@ -1,14 +1,13 @@
 // Apple App Store Server Notifications v2 handler.
-// - Apple POSTs a signed JWS; the outer `signedPayload` wraps `signedTransactionInfo`
-//   and `signedRenewalInfo`, each itself a JWS.
-// - Chain validation against Apple root CA should be done in production — this
-//   handler decodes payloads and trusts them when ENV["APPLE_VERIFY_CHAIN"] != "1".
-//   Promote to full x5c chain validation before shipping to the App Store.
-// - Apple delivers the same notification multiple times if ACK is not 200; we
-//   dedupe via apple_events.
+// - Verifies the outer JWS + nested signedTransactionInfo / signedRenewalInfo
+//   against Apple's ECDSA P-256 signing key (extracted from the x5c leaf cert).
+// - When APPLE_VERIFY_CHAIN=1, also pins the final cert in the chain to
+//   Apple Root CA-G3's SubjectPublicKeyInfo (see _shared/apple-jws.ts).
+// - Dedupes via apple_events.
 
 import { corsHeaders } from "../_shared/cors.ts";
 import { adminClient } from "../_shared/supabase.ts";
+import { verifyAndDecode } from "../_shared/apple-jws.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -16,12 +15,12 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json() as { signedPayload: string };
-    const payload = decodeJwsPayload<ASNPayload>(body.signedPayload);
+    const payload = await verifyAndDecode<ASNPayload>(body.signedPayload);
 
     const txInfo = payload.data?.signedTransactionInfo
-      ? decodeJwsPayload<TxInfo>(payload.data.signedTransactionInfo) : null;
+      ? await verifyAndDecode<TxInfo>(payload.data.signedTransactionInfo) : null;
     const renewInfo = payload.data?.signedRenewalInfo
-      ? decodeJwsPayload<RenewInfo>(payload.data.signedRenewalInfo) : null;
+      ? await verifyAndDecode<RenewInfo>(payload.data.signedRenewalInfo) : null;
 
     const supabase = adminClient();
 
@@ -79,21 +78,6 @@ function resolvePlanFromProductId(productId: string): "free" | "pro" | "elite" {
   if (productId.endsWith(".elite")) return "elite";
   if (productId.endsWith(".pro")) return "pro";
   return "free";
-}
-
-function decodeJwsPayload<T>(jws: string): T {
-  const [_header, payload] = jws.split(".");
-  const json = new TextDecoder().decode(base64UrlDecode(payload));
-  return JSON.parse(json) as T;
-}
-
-function base64UrlDecode(input: string): Uint8Array {
-  const pad = input.length % 4 === 0 ? "" : "=".repeat(4 - (input.length % 4));
-  const b64 = (input + pad).replace(/-/g, "+").replace(/_/g, "/");
-  const bin = atob(b64);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
 }
 
 interface ASNPayload {

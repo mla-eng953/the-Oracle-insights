@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { identify } from "@/lib/telemetry";
 
 interface AuthState {
   user: User | null;
@@ -24,9 +25,11 @@ function initialize() {
   initialized = true;
   supabase.auth.getSession().then(({ data }) => {
     set({ session: data.session, user: data.session?.user ?? null, loading: false });
+    if (data.session?.user) identify(data.session.user.id, data.session.user.email);
   });
   supabase.auth.onAuthStateChange((_event, session) => {
     set({ session, user: session?.user ?? null, loading: false });
+    if (session?.user) identify(session.user.id, session.user.email);
   });
 }
 

@@ -3,12 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { IdVerify } from "@/components/IdVerify";
 import { useComplianceCtx } from "@/contexts/ComplianceProvider";
 import { summaryLine } from "@/lib/compliance";
+import { useAgeVerificationStatus } from "@/hooks/useAgeVerificationStatus";
 import { useState } from "react";
 
 export default function Compliance() {
   const { check } = useComplianceCtx();
+  const { data: idStatus } = useAgeVerificationStatus();
   const [hours, setHours] = useState<number>(24);
 
   function setCooloff() {
@@ -27,6 +30,8 @@ export default function Compliance() {
             <p className="text-sm">{check ? summaryLine(check) : "Checking…"}</p>
           </CardContent>
         </Card>
+
+        <IdVerify status={idStatus ?? null} />
 
         <Card>
           <CardHeader><CardTitle>Take a break</CardTitle></CardHeader>

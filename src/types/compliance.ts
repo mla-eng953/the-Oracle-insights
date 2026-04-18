@@ -9,6 +9,10 @@ export interface ComplianceCheck {
   ageVerified: boolean;
   ageVerifiedAt?: string;
   checkedAt: string;
+  isVpn?: boolean;
+  isHosting?: boolean;
+  isTor?: boolean;
+  riskScore?: number;
 }
 
 export interface ResponsibleGamblingState {

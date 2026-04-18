@@ -7,14 +7,14 @@ Track this document top-to-bottom before submitting to Apple. Every unchecked it
 - [x] Server-side geo check (`compliance-check` edge fn) using Cloudflare-style `cf-ipcountry` + `cf-region-code` headers. Result cached per-user in `compliance_checks`.
 - [x] `RESTRICTED_US_STATES` list (CA, TX, GA, SC, AL, MN, MO, HI, UT, ID, WI, OK, AK) — **review quarterly** against the latest state-level legislation. This list is conservative, not authoritative.
 - [x] `BLOCKED_COUNTRIES` per US sanctions (CU, IR, KP, SY, RU).
-- [ ] Integrate a paid IP intelligence provider (MaxMind GeoIP2 Precision or IPInfo) for production — free CF headers miss VPN detection.
-- [ ] VPN / proxy detection — reject if `anonymous_proxy` or `hosting_provider` flags set.
+- [x] **MaxMind GeoIP2 Insights** integration in `_shared/geoip.ts`. Falls back to CF headers when env vars unset.
+- [x] **VPN / Tor / hosting-provider blocking** when `COMPLIANCE_BLOCK_ANONYMIZERS=1` (default on).
 - [ ] Cellular / Wi-Fi GPS reconciliation on iOS (`CoreLocation`) — IP alone fails for travelers.
 
 ## 2. Age verification
 
 - [x] Client-side 21+ gate (`ComplianceGate`) with DOB input, persisted in `age_verifications`.
-- [ ] Replace self-attested DOB with ID-verification partner (Veriff, Jumio, Persona) before store submission. Self-attested won't pass Apple review for a sports-betting-adjacent app.
+- [x] **Persona ID-verification** integration: `create-persona-inquiry` edge fn launches the hosted flow; `persona-webhook` upserts `age_verifications.status` to `approved` / `declined`. UI in `IdVerify` component on Compliance page.
 - [ ] Refuse bulk account creation from same device — device-fingerprint via FingerprintJS or fingerprint-oss.
 
 ## 3. Responsible gambling
@@ -38,9 +38,9 @@ Track this document top-to-bottom before submitting to Apple. Every unchecked it
 
 - [ ] App category: **Sports / Reference**, age rating **17+** (18+ minimum; Apple has no 21+ tier).
 - [ ] Guideline 4.5.4 (push notifications) — user-opt-in only; no promotional push without consent.
-- [ ] Guideline 3.1.1 / 3.1.3 — **credits cannot be converted to anything purchasable without IAP**. Current architecture: keep credits free/non-purchasable on iOS, Pro subscription must go through **StoreKit 2** (not Stripe). Separate entitlement reconciliation:
-  - Web users → Stripe subscription → `user_subscriptions.stripe_subscription_id`
-  - iOS users → StoreKit → `user_subscriptions.apple_original_transaction_id`
+- [x] Guideline 3.1.1 / 3.1.3 — **credits cannot be converted to anything purchasable without IAP**. Current architecture: keep credits free/non-purchasable on iOS, Pro subscription must go through **StoreKit 2** (not Stripe). Separate entitlement reconciliation:
+  - Web users → Stripe subscription → `user_subscriptions.stripe_subscription_id` (`stripe-webhook` + `entitlements` table).
+  - iOS users → StoreKit → `user_subscriptions.apple_original_transaction_id` (`apple-webhook` with JWS chain pinned to Apple Root CA-G3).
 - [ ] Guideline 5.3.3 (gaming, gambling, and lotteries) — you're **informational**, not a sportsbook. Make this explicit in your review notes to Apple.
 - [ ] Privacy nutrition label: Data Linked to User = Contact Info, Identifiers, Usage. Do **not** declare tracking (no IDFA / third-party ad SDK).
 - [ ] No betting links that deep-link into sportsbook apps from iOS build — classified as "facilitating real-money gambling" without an operator license.
@@ -48,9 +48,9 @@ Track this document top-to-bottom before submitting to Apple. Every unchecked it
 ## 6. Privacy & data
 
 - [x] RLS on every table.
-- [ ] Privacy policy (`/privacy`) + Terms of Service (`/terms`) routes — required by Apple and by CCPA/GDPR.
-- [ ] Data deletion: self-serve "Delete my account" in `Profile` page. Apple 5.1.1(v) requires it since 2022.
-- [ ] DSR (data subject request) endpoint for GDPR/CCPA export.
+- [x] Privacy policy (`/privacy`) + Terms of Service (`/terms`) routes.
+- [x] Data deletion: self-serve at `/settings/delete` → `delete-account` edge fn cascades through all user-scoped tables and `auth.users`. Satisfies Apple 5.1.1(v) and CCPA.
+- [ ] DSR (data subject request) endpoint for GDPR/CCPA export — `export-account-data` edge fn TBD.
 - [ ] Signed URLs for any user-generated content in Storage.
 
 ## 7. Payments
@@ -61,10 +61,10 @@ Track this document top-to-bottom before submitting to Apple. Every unchecked it
 
 ## 8. Operations
 
-- [ ] Error tracking: Sentry.
-- [ ] Product analytics: PostHog or Mixpanel.
+- [x] Error tracking: Sentry (`src/lib/telemetry.ts` + `ErrorBoundary` integration; respects opt-out and DNT).
+- [x] Product analytics: PostHog (autocapture off, IP scrubbed, opt-out surfaced in Settings).
 - [ ] Edge-function logs streamed to BetterStack / Grafana.
-- [ ] Daily job: `capture-closing-odds` must run 20 min pre-kickoff per match. Use Supabase `pg_cron` or GitHub Actions with secrets.
+- [x] `pg_cron` schedules in `20260418000008_cron.sql`: `generate-picks` (15 + 23 UTC), `capture-closing-odds` (every minute, self-filtering), `settle-picks` (every 5 min).
 - [ ] Weekly model-drift check: compare rolling-30-day CLV distribution per sport against the previous 30d — alert if it shifts >1σ.
 
 ## 9. Model governance

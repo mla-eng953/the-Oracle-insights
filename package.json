@@ -11,7 +11,10 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "1.1.2",
     "@radix-ui/react-dialog": "1.1.2",
+    "@sentry/react": "8.40.0",
+    "posthog-js": "1.194.0",
     "@radix-ui/react-label": "2.1.0",
     "@radix-ui/react-popover": "1.1.2",
     "@radix-ui/react-progress": "1.1.0",

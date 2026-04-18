@@ -12,8 +12,11 @@ const MarketIntel = lazy(() => import("@/pages/MarketIntel"));
 const Analytics = lazy(() => import("@/pages/Analytics"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const Settings = lazy(() => import("@/pages/Settings"));
+const DeleteAccount = lazy(() => import("@/pages/DeleteAccount"));
 const Compliance = lazy(() => import("@/pages/Compliance"));
 const Billing = lazy(() => import("@/pages/Billing"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
+const Terms = lazy(() => import("@/pages/Terms"));
 const Auth = lazy(() => import("@/pages/Auth"));
 const Install = lazy(() => import("@/pages/Install"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -43,8 +46,11 @@ export function AnimatedRoutes() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/delete" element={<DeleteAccount />} />
           <Route path="/compliance" element={<Compliance />} />
           <Route path="/billing" element={<Billing />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth/callback" element={<Auth />} />
           <Route path="/install" element={<Install />} />
